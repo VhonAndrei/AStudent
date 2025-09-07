@@ -1,0 +1,182 @@
+class Node:
+    def __init__(self, station):
+        self.station = station
+        self.next = None
+        
+class Station:
+    def __init__(self):
+        self.head = None
+        self.size = 0
+    
+    def addStation(self, station):
+        new_node = Node(station)
+        if self.head is None:
+            self.head = new_node
+            self.size += 1
+            print(f"{station} added as first station")
+            return
+        current = self.head
+        while current.next:
+            current = current.next
+        current.next = new_node
+        self.size += 1
+        if self.size == 2:
+            print(f"{station} added automatically")
+
+    def delete(self, target):
+        current = self.head
+        if current and current.station == target:
+            self.head = current.next
+            return True
+        prev = None
+        while current:
+            if current.station == target:
+                prev.next = current.next
+                return True
+            prev = current
+            current = current.next
+        return False
+    
+    def search(self, target):
+        current = self.head
+        while current:
+            if current.station == target:
+                return current.station
+            current = current.next
+        return None
+        
+    def distance(self, elem1, elem2):
+        index1, index2 = -1, -1
+        index = 0
+        current = self.head
+        while current:
+            if current.station == elem1:
+                index1 = index
+            if current.station == elem2:
+                index2 = index
+            current = current.next
+            index += 1
+        if index1 == -1 or index2 == -1:
+            raise ValueError("One or both elements not found in the list")
+        return abs(index1 - index2)
+    
+    def length(self):
+        return self.size
+    
+    def insert(self, data, position):
+        new_node = Node(data)
+        if position == 1:
+            new_node.next = self.head
+            self.head = new_node
+            self.size += 1
+            return
+        current = self.head
+        index = 1
+        while current and index < position - 1:
+            current = current.next
+            index += 1
+        if not current:
+            raise IndexError("Position out of range")
+        new_node.next = current.next
+        current.next = new_node
+        self.size += 1
+    
+    def display(self):
+        if self.head is None:
+            print("No stations available.")
+            return
+        current = self.head
+        i = 1
+        while current:
+            print(f"[{i}] {current.station}")
+            current = current.next
+            i += 1
+
+    def help(self):
+        print("""Available Actions:
+    Help             -   Show this menu
+    printAllstations -   Show all stations
+    addnewstation    -   Add a new station
+    deletestation    -   Delete a station
+    getdistance      -   Measure the distance between two stations
+    stop             -   Stop current run
+    exit             -   Exit the program completely""")
+ 
+def Trainline():
+    stations = Station()
+    stations.help()
+    while True:
+        command = input("\nChoose Action (Help for menu):  ").strip().lower()
+            
+        if command == "help":
+            stations.help()
+        
+        elif command == "addnewstation":
+            add = input("Enter Station: ")
+            if add.lower() == "stop":
+                print("Stop detected, stopping the function")
+                continue
+
+            if stations.length() >= 3:
+                stations.display()
+                print("\nInsert at:")
+                stations.display()
+                location = input("Enter the position: ")
+
+                if location.lower() == "stop":
+                    print("Stop detected, stopping the function")
+                    continue
+
+                try:
+                    location = int(location)
+                    stations.insert(add, location)
+                    print(add, "is added.")
+                except ValueError:
+                    print("Invalid input. Station not added.")
+                except IndexError as e:
+                    print(e)
+            else:
+                if add != "":
+                    stations.addStation(add)
+                else:
+                    print("Invalid station")
+                    
+        elif command == "printallstations":
+            stations.display()
+            
+        elif command == "deletestation":
+            toDelete = input("Enter the station: ")
+            if toDelete.lower() == "stop":
+                print("Stop detected, stopping the function")
+                continue
+            if stations.search(toDelete):
+                stations.delete(toDelete)
+                print(toDelete, "is successfully deleted.")
+            else:
+                print("Station not found.")
+        
+        elif command == "exit":
+            print("Exiting program completely...")
+            exit()
+        
+        elif command == "getdistance":
+            station1 = input("Enter the first station: ")
+            if station1.lower() == "stop":
+                print("Stop detected, stopping the function")
+                continue
+
+            station2 = input("Enter the second station: ")
+            if station2.lower() == "stop":
+                print("Stop detected, stopping the function")
+                continue
+
+            try:
+                print("Distance:", stations.distance(station1, station2))
+            except ValueError as e:
+                print(e)
+                
+        else:
+            print("Unknown command. Type 'help' for options.")
+
+if __name__ == "__main__":
+    Trainline()
